@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HI-A547-C Production Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+<style>
+  :root {
+    --bg: #ececec;       /* neutral gray */
+    --panel: #f5f5f5;    /* slightly lighter panel */
+    --ink: #232323;
+    --ink-soft: #666666;
+    --rule: #d4d4d4;
+    --oil: #2f7a3a;      /* green */
+    --gas: #b03a2e;      /* red  */
+    --water: #1f5fa8;    /* blue */
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 10px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 23px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  header .updated {
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .top-row {
+    display: grid;
+    grid-template-columns: minmax(280px, 1fr) 2fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .panel h2 {
+    margin: 0 0 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+  }
+
+  /* Latest production card */
+  .latest-date {
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+  .kv {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 12px;
+    align-items: baseline;
+  }
+  .kv .label {
+    color: var(--ink-soft);
+  }
+  .kv .value {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    text-align: right;
+  }
+  .kv .unit {
+    color: var(--ink-soft);
+    font-weight: 400;
+    margin-left: 4px;
+    font-size: 13px;
+  }
+  .swatch {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  .swatch.oil   { background: var(--oil); }
+  .swatch.gas   { background: var(--gas); }
+  .swatch.water { background: var(--water); }
+
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+  .chart-30 {
+    height: 260px;
+  }
+  .chart-history-scroller {
+    overflow-x: auto;
+    overflow-y: hidden;
+    /* Visual cue that you can scroll: subtle inner shadow on right edge */
+    background:
+      linear-gradient(to left, rgba(35,35,35,0.10), transparent 24px) right center / 24px 100% no-repeat,
+      linear-gradient(to right, rgba(35,35,35,0.10), transparent 24px) left center / 24px 100% no-repeat,
+      var(--panel);
+  }
+  .chart-history-inner {
+    /* width set dynamically by JS based on # of months; height fixed */
+    height: 360px;
+    min-width: 100%;
+  }
+  .scroll-hint {
+    color: var(--ink-soft);
+    font-size: 12px;
+    margin-top: 6px;
+    text-align: right;
+    font-style: italic;
+  }
+
+  .downloads {
+    margin-top: 12px;
+    font-size: 14px;
+  }
+  .downloads a {
+    color: var(--ink);
+    text-decoration: underline;
+    margin-right: 16px;
+  }
+
+  footer {
+    margin-top: 20px;
+    color: var(--ink-soft);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .loading {
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+  .error {
+    color: var(--gas);
+  }
+
+  @media (max-width: 800px) {
+    .top-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>HI-A547-C Production</h1>
+    <div class="updated" id="updated">Loading...</div>
+  </header>
+
+  <div class="top-row">
+    <!-- Upper left: latest -->
+    <div class="panel">
+      <h2>Latest Daily Production</h2>
+      <div class="latest-date" id="latest-date">—</div>
+      <div class="kv" id="latest-kv">
+        <div class="label loading">Loading...</div>
+        <div class="value"></div>
+      </div>
+    </div>
+
+    <!-- Upper right: rolling 30-day -->
+    <div class="panel">
+      <h2>Last 30 Days</h2>
+      <div class="chart-wrap chart-30">
+        <canvas id="chart-30"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: full history, scrollable -->
+  <div class="panel">
+    <h2>Full Production History</h2>
+    <div class="chart-history-scroller" id="history-scroller">
+      <div class="chart-history-inner" id="history-inner">
+        <canvas id="chart-history"></canvas>
+      </div>
+    </div>
+    <div class="scroll-hint">← scroll horizontally to see earlier periods →</div>
+    <div class="downloads">
+      <a id="dl-csv"  href="arena_production.csv"  download>Download CSV</a>
+      <a id="dl-json" href="arena_production.json" download>Download JSON</a>
+    </div>
+  </div>
+
+  <footer>
+    Data extracted from Arena Energy Daily Production Reports.
+    Gas reported in mmcf (thousand mcf); oil and water in bbl.
+    Gaps reflect days no report was issued.
+  </footer>
+</div>
+
+<script type="module">
+  // --- Config ----------------------------------------------------------------
+  const CSV_URL = 'arena_production.csv';
+  const COLORS = {
+    oil:   getCssVar('--oil'),
+    gas:   getCssVar('--gas'),
+    water: getCssVar('--water'),
+  };
+  // Bottom chart: pixels per day of horizontal space.  ~13 months visible in
+  // 1200px viewport means ~3 px/day; the inner width then grows with history.
+  const PX_PER_DAY = 3;
+
+  function getCssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  // --- CSV parsing -----------------------------------------------------------
+  function parseCsv(text) {
+    const lines = text.trim().split(/\r?\n/);
+    const header = lines.shift().split(',');
+    const idx = Object.fromEntries(header.map((h, i) => [h, i]));
+    return lines.map(line => {
+      // Production reports don't contain quoted fields, simple split is safe.
+      const cols = line.split(',');
+      const num = key => {
+        const v = cols[idx[key]];
+        return (v === '' || v == null) ? null : Number(v);
+      };
+      return {
+        date:       cols[idx['production_date']],
+        gas_mmcf:   num('gas_sales')  != null ? num('gas_sales')  / 1000 : null,
+        oil_bbl:    num('oil_sales'),
+        water_bbl:  num('water'),
+        pf_fuel:    num('pf_fuel'),
+        vent_flare: num('vent_flare'),
+      };
+    });
+  }
+
+  // --- Helpers ---------------------------------------------------------------
+  const fmtInt = n => (n == null || isNaN(n)) ? '—' : n.toLocaleString('en-US');
+  const fmtMmcf = n => (n == null || isNaN(n)) ? '—' : n.toLocaleString('en-US', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  const prettyDate = iso => {
+    const [y, m, d] = iso.split('-').map(Number);
+    return new Date(Date.UTC(y, m - 1, d)).toLocaleDateString('en-US', {
+      timeZone: 'UTC', month: 'long', day: 'numeric', year: 'numeric',
+    });
+  };
+
+  // Fill calendar gaps in a date-sorted series with explicit null y-values, so
+  // Chart.js draws breaks where days are missing instead of interpolating.
+  function fillCalendarGaps(rows) {
+    if (rows.length === 0) return rows;
+    const out = [];
+    const oneDay = 86400000;
+    let prev = null;
+    for (const r of rows) {
+      const t = Date.parse(r.date + 'T00:00:00Z');
+      if (prev != null) {
+        for (let g = prev + oneDay; g < t; g += oneDay) {
+          const d = new Date(g).toISOString().slice(0, 10);
+          out.push({ date: d, gas_mmcf: null, oil_bbl: null, water_bbl: null });
+        }
+      }
+      out.push(r);
+      prev = t;
+    }
+    return out;
+  }
+
+  // --- Charts ----------------------------------------------------------------
+  function makeDataset(label, color, data, axisId) {
+    return {
+      label,
+      data,
+      borderColor: color,
+      backgroundColor: color,
+      borderWidth: 1.5,
+      pointRadius: 0,
+      pointHoverRadius: 3,
+      spanGaps: false,   // honor null entries (=days with no report)
+      yAxisID: axisId,
+      tension: 0,
+    };
+  }
+
+  function commonScales() {
+    return {
+      x: {
+        type: 'time',
+        time: { unit: 'month', tooltipFormat: 'PP' },
+        grid: { color: 'rgba(35,35,35,0.06)' },
+        ticks: { color: getCssVar('--ink-soft'), maxRotation: 0, autoSkip: true },
+      },
+      yLeft: {
+        type: 'linear',
+        position: 'left',
+        title: { display: true, text: 'Oil / Water (bbl)', color: getCssVar('--ink-soft') },
+        grid:  { color: 'rgba(35,35,35,0.06)' },
+        ticks: { color: getCssVar('--ink-soft') },
+      },
+      yRight: {
+        type: 'linear',
+        position: 'right',
+        title: { display: true, text: 'Gas (mmcf)', color: getCssVar('--ink-soft') },
+        grid:  { drawOnChartArea: false },
+        ticks: { color: getCssVar('--ink-soft') },
+      },
+    };
+  }
+
+  function drawChart(canvas, rows) {
+    const points = (key) => rows.map(r => ({ x: r.date, y: r[key] }));
+    return new Chart(canvas, {
+      type: 'line',
+      data: {
+        datasets: [
+          makeDataset('Oil',   COLORS.oil,   points('oil_bbl'),   'yLeft'),
+          makeDataset('Water', COLORS.water, points('water_bbl'), 'yLeft'),
+          makeDataset('Gas',   COLORS.gas,   points('gas_mmcf'),  'yRight'),
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        plugins: {
+          legend: { labels: { color: getCssVar('--ink'), boxWidth: 12, boxHeight: 4 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const v = ctx.parsed.y;
+                if (v == null) return `${ctx.dataset.label}: —`;
+                const unit = ctx.dataset.label === 'Gas' ? 'mmcf' : 'bbl';
+                const formatted = ctx.dataset.label === 'Gas'
+                  ? v.toLocaleString('en-US', { maximumFractionDigits: 2 })
+                  : v.toLocaleString('en-US');
+                return `${ctx.dataset.label}: ${formatted} ${unit}`;
+              },
+            },
+          },
+        },
+        scales: commonScales(),
+      },
+    });
+  }
+
+  // --- Render ----------------------------------------------------------------
+  function renderLatest(latest) {
+    document.getElementById('latest-date').textContent = prettyDate(latest.date);
+    const kv = document.getElementById('latest-kv');
+    kv.innerHTML = `
+      <div class="label"><span class="swatch gas"></span>Gas</div>
+      <div class="value">${fmtMmcf(latest.gas_mmcf)}<span class="unit">mmcf</span></div>
+
+      <div class="label"><span class="swatch oil"></span>Oil</div>
+      <div class="value">${fmtInt(latest.oil_bbl)}<span class="unit">bbl</span></div>
+
+      <div class="label"><span class="swatch water"></span>Water</div>
+      <div class="value">${fmtInt(latest.water_bbl)}<span class="unit">bbl</span></div>
+
+      <div class="label">PF Fuel</div>
+      <div class="value">${fmtInt(latest.pf_fuel)}<span class="unit">mcf</span></div>
+
+      <div class="label">Vent / Flare</div>
+      <div class="value">${fmtInt(latest.vent_flare)}<span class="unit">mcf</span></div>
+    `;
+  }
+
+  function renderUpdated(latest) {
+    document.getElementById('updated').textContent = `Latest production: ${prettyDate(latest.date)}`;
+  }
+
+  // --- Boot ------------------------------------------------------------------
+  (async function main() {
+    let text;
+    try {
+      const resp = await fetch(CSV_URL, { cache: 'no-store' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      text = await resp.text();
+    } catch (e) {
+      document.getElementById('updated').innerHTML =
+        `<span class="error">Failed to load ${CSV_URL}: ${e.message}</span>`;
+      return;
+    }
+
+    const rows = parseCsv(text)
+      .filter(r => r.date)
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    if (rows.length === 0) {
+      document.getElementById('updated').innerHTML = '<span class="error">No data rows</span>';
+      return;
+    }
+
+    const latest = rows[rows.length - 1];
+    renderUpdated(latest);
+    renderLatest(latest);
+
+    // 30-day chart: calendar last 30 days ending at latest production date.
+    const oneDay = 86400000;
+    const endT = Date.parse(latest.date + 'T00:00:00Z');
+    const startT = endT - 29 * oneDay;
+    const recent = rows.filter(r => {
+      const t = Date.parse(r.date + 'T00:00:00Z');
+      return t >= startT && t <= endT;
+    });
+    drawChart(document.getElementById('chart-30'), fillCalendarGaps(recent));
+
+    // Full history: size the inner div so ~PX_PER_DAY * days of history.
+    const firstT = Date.parse(rows[0].date + 'T00:00:00Z');
+    const totalDays = Math.round((endT - firstT) / oneDay) + 1;
+    const inner = document.getElementById('history-inner');
+    inner.style.width = Math.max(1200, totalDays * PX_PER_DAY) + 'px';
+    drawChart(document.getElementById('chart-history'), fillCalendarGaps(rows));
+
+    // Scroll the history pane to the right (most recent) on load.
+    const scroller = document.getElementById('history-scroller');
+    requestAnimationFrame(() => { scroller.scrollLeft = scroller.scrollWidth; });
+  })();
+</script>
+</body>
+</html>
