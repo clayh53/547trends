@@ -124,18 +124,32 @@
   .chart-30 {
     height: 260px;
   }
+  /* History pane: fixed Y-axis chart on each side, plot scrolls between them.
+     Grid: [left axis | scroller (flexible) | right axis] */
+  .chart-history {
+    display: grid;
+    grid-template-columns: 58px 1fr 58px;
+    height: 360px;
+    background: var(--panel);
+  }
+  .chart-history-axis {
+    position: relative;
+    height: 100%;
+    /* No overflow — these only draw the y-axis ticks/labels */
+  }
   .chart-history-scroller {
     overflow-x: auto;
     overflow-y: hidden;
-    /* Visual cue that you can scroll: subtle inner shadow on right edge */
+    height: 100%;
+    /* Visual cue that you can scroll: subtle inner shadow on left/right edges */
     background:
-      linear-gradient(to left, rgba(35,35,35,0.10), transparent 24px) right center / 24px 100% no-repeat,
-      linear-gradient(to right, rgba(35,35,35,0.10), transparent 24px) left center / 24px 100% no-repeat,
+      linear-gradient(to left, rgba(35,35,35,0.10), transparent 18px) right center / 18px 100% no-repeat,
+      linear-gradient(to right, rgba(35,35,35,0.10), transparent 18px) left center / 18px 100% no-repeat,
       var(--panel);
   }
   .chart-history-inner {
     /* width set dynamically by JS based on # of months; height fixed */
-    height: 360px;
+    height: 100%;
     min-width: 100%;
   }
   .scroll-hint {
@@ -203,13 +217,17 @@
     </div>
   </div>
 
-  <!-- Bottom: full history, scrollable -->
+  <!-- Bottom: full history, scrollable plot with fixed Y-axes -->
   <div class="panel">
     <h2>Full Production History</h2>
-    <div class="chart-history-scroller" id="history-scroller">
-      <div class="chart-history-inner" id="history-inner">
-        <canvas id="chart-history"></canvas>
+    <div class="chart-history">
+      <div class="chart-history-axis"><canvas id="chart-history-yleft"></canvas></div>
+      <div class="chart-history-scroller" id="history-scroller">
+        <div class="chart-history-inner" id="history-inner">
+          <canvas id="chart-history"></canvas>
+        </div>
       </div>
+      <div class="chart-history-axis"><canvas id="chart-history-yright"></canvas></div>
     </div>
     <div class="scroll-hint">← scroll horizontally to see earlier periods →</div>
     <div class="downloads">
@@ -372,6 +390,139 @@
     });
   }
 
+  // Compute y-axis ranges from the data so the three history charts can
+  // all share the same scales (fixed axes outside + scrolling plot inside).
+  function computeYRanges(rows) {
+    const leftVals = [];
+    const rightVals = [];
+    for (const r of rows) {
+      if (r.oil_bbl   != null) leftVals.push(r.oil_bbl);
+      if (r.water_bbl != null) leftVals.push(r.water_bbl);
+      if (r.gas_mmcf  != null) rightVals.push(r.gas_mmcf);
+    }
+    const niceMax = (v) => {
+      if (v <= 0) return 1;
+      const mag = Math.pow(10, Math.floor(Math.log10(v)));
+      return Math.ceil(v / mag * 1.05) * mag;
+    };
+    return {
+      leftMin:  0,
+      leftMax:  niceMax(Math.max(...leftVals)),
+      rightMin: 0,
+      rightMax: niceMax(Math.max(...rightVals)),
+    };
+  }
+
+  // The scrolling history plot itself: same data as drawChart, but with its
+  // own y-axes drawn invisibly (so the plot lines up exactly with the fixed
+  // axis charts on either side).
+  function drawHistoryPlot(canvas, rows, yRanges) {
+    const points = (key) => rows.map(r => ({ x: r.date, y: r[key] }));
+    const hidden = {
+      ticks: { display: false },
+      title: { display: false },
+      border: { display: false },
+    };
+    return new Chart(canvas, {
+      type: 'line',
+      data: {
+        datasets: [
+          makeDataset('Oil',   COLORS.oil,   points('oil_bbl'),   'yLeft'),
+          makeDataset('Water', COLORS.water, points('water_bbl'), 'yLeft'),
+          makeDataset('Gas',   COLORS.gas,   points('gas_mmcf'),  'yRight'),
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        layout: { padding: { left: 0, right: 0 } },
+        plugins: {
+          legend: { labels: { color: getCssVar('--ink'), boxWidth: 12, boxHeight: 4 } },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const v = ctx.parsed.y;
+                if (v == null) return `${ctx.dataset.label}: —`;
+                const unit = ctx.dataset.label === 'Gas' ? 'mmcf' : 'bbl';
+                const formatted = ctx.dataset.label === 'Gas'
+                  ? v.toLocaleString('en-US', { maximumFractionDigits: 2 })
+                  : v.toLocaleString('en-US');
+                return `${ctx.dataset.label}: ${formatted} ${unit}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: { unit: 'month', tooltipFormat: 'PP' },
+            grid: { color: 'rgba(35,35,35,0.06)' },
+            ticks: { color: getCssVar('--ink-soft'), maxRotation: 0, autoSkip: true },
+          },
+          yLeft: {
+            ...hidden,
+            type: 'linear',
+            position: 'left',
+            min: yRanges.leftMin,
+            max: yRanges.leftMax,
+            grid: { color: 'rgba(35,35,35,0.06)' },
+          },
+          yRight: {
+            ...hidden,
+            type: 'linear',
+            position: 'right',
+            min: yRanges.rightMin,
+            max: yRanges.rightMax,
+            grid: { drawOnChartArea: false },
+          },
+        },
+      },
+    });
+  }
+
+  // A degenerate "chart" that draws only a single y-axis — used as the
+  // fixed left and right rails outside the scrolling plot.  We draw an
+  // invisible dataset so Chart.js has something to plot, then hide the
+  // x-axis and the *other* y-axis entirely.
+  function drawAxisOnly(canvas, side, range, titleText) {
+    const isLeft = (side === 'left');
+    const minY = isLeft ? range.leftMin  : range.rightMin;
+    const maxY = isLeft ? range.leftMax  : range.rightMax;
+    return new Chart(canvas, {
+      type: 'line',
+      data: {
+        datasets: [{
+          data: [{ x: 0, y: minY }, { x: 1, y: maxY }],
+          borderColor: 'transparent',
+          backgroundColor: 'transparent',
+          pointRadius: 0,
+          yAxisID: 'y',
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        layout: { padding: { top: 0, bottom: 0 } },
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false, type: 'linear' },
+          y: {
+            type: 'linear',
+            position: isLeft ? 'left' : 'right',
+            min: minY,
+            max: maxY,
+            title: { display: true, text: titleText, color: getCssVar('--ink-soft') },
+            grid: { display: false },
+            border: { display: false },
+            ticks: { color: getCssVar('--ink-soft') },
+          },
+        },
+      },
+    });
+  }
+
   // --- Render ----------------------------------------------------------------
   function renderLatest(latest) {
     document.getElementById('latest-date').textContent = prettyDate(latest.date);
@@ -439,7 +590,15 @@
     const totalDays = Math.round((endT - firstT) / oneDay) + 1;
     const inner = document.getElementById('history-inner');
     inner.style.width = Math.max(1200, totalDays * PX_PER_DAY) + 'px';
-    drawChart(document.getElementById('chart-history'), fillCalendarGaps(rows));
+
+    // Three coordinated charts: fixed left axis | scrolling plot | fixed right axis.
+    // Y-ranges are computed from the full dataset once, then handed to all three
+    // so the axes outside the scroller match the plot inside it.
+    const filledHistory = fillCalendarGaps(rows);
+    const yRanges = computeYRanges(filledHistory);
+    drawAxisOnly(document.getElementById('chart-history-yleft'),  'left',  yRanges, 'Oil / Water (bbl)');
+    drawAxisOnly(document.getElementById('chart-history-yright'), 'right', yRanges, 'Gas (mmcf)');
+    drawHistoryPlot(document.getElementById('chart-history'), filledHistory, yRanges);
 
     // Scroll the history pane to the right (most recent) on load.
     const scroller = document.getElementById('history-scroller');
