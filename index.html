@@ -124,18 +124,34 @@
   .chart-30 {
     height: 260px;
   }
-  /* History pane: fixed Y-axis chart on each side, plot scrolls between them.
-     Grid: [left axis | scroller (flexible) | right axis] */
+  /* History pane: 5-column grid.
+     [left title | left ticks | scroller (flexible) | right ticks | right title]
+     Title columns hold a single rotated text label; tick columns hold a
+     Chart.js canvas that draws only numeric tick labels. */
   .chart-history {
     display: grid;
-    grid-template-columns: 108px 1fr 88px;
+    grid-template-columns: 22px 64px 1fr 56px 22px;
     height: 360px;
     background: var(--panel);
   }
   .chart-history-axis {
     position: relative;
     height: 100%;
-    /* No overflow — these only draw the y-axis ticks/labels */
+  }
+  .chart-history-title {
+    position: relative;
+    height: 100%;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+  .chart-history-title span {
+    /* Center the rotated label vertically in its column */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-90deg);
+    transform-origin: center;
+    white-space: nowrap;
   }
   .chart-history-scroller {
     overflow-x: auto;
@@ -221,6 +237,7 @@
   <div class="panel">
     <h2>Full Production History</h2>
     <div class="chart-history">
+      <div class="chart-history-title"><span>Oil / Water (bbl)</span></div>
       <div class="chart-history-axis"><canvas id="chart-history-yleft"></canvas></div>
       <div class="chart-history-scroller" id="history-scroller">
         <div class="chart-history-inner" id="history-inner">
@@ -228,6 +245,7 @@
         </div>
       </div>
       <div class="chart-history-axis"><canvas id="chart-history-yright"></canvas></div>
+      <div class="chart-history-title"><span>Gas (mmcf)</span></div>
     </div>
     <div class="scroll-hint">← scroll horizontally to see earlier periods →</div>
     <div class="downloads">
@@ -482,10 +500,10 @@
   }
 
   // A degenerate "chart" that draws only a single y-axis — used as the
-  // fixed left and right rails outside the scrolling plot.  We draw an
-  // invisible dataset so Chart.js has something to plot, then hide the
-  // x-axis and the *other* y-axis entirely.
-  function drawAxisOnly(canvas, side, range, titleText) {
+  // fixed left and right rails outside the scrolling plot.  Title text is
+  // rendered separately in HTML so it doesn't fight with the tick numbers
+  // for column width.
+  function drawAxisOnly(canvas, side, range) {
     const isLeft = (side === 'left');
     const minY = isLeft ? range.leftMin  : range.rightMin;
     const maxY = isLeft ? range.leftMax  : range.rightMax;
@@ -513,7 +531,6 @@
             position: isLeft ? 'left' : 'right',
             min: minY,
             max: maxY,
-            title: { display: true, text: titleText, color: getCssVar('--ink-soft') },
             grid: { display: false },
             border: { display: false },
             ticks: { color: getCssVar('--ink-soft') },
@@ -596,8 +613,8 @@
     // so the axes outside the scroller match the plot inside it.
     const filledHistory = fillCalendarGaps(rows);
     const yRanges = computeYRanges(filledHistory);
-    drawAxisOnly(document.getElementById('chart-history-yleft'),  'left',  yRanges, 'Oil / Water (bbl)');
-    drawAxisOnly(document.getElementById('chart-history-yright'), 'right', yRanges, 'Gas (mmcf)');
+    drawAxisOnly(document.getElementById('chart-history-yleft'),  'left',  yRanges);
+    drawAxisOnly(document.getElementById('chart-history-yright'), 'right', yRanges);
     drawHistoryPlot(document.getElementById('chart-history'), filledHistory, yRanges);
 
     // Scroll the history pane to the right (most recent) on load.
