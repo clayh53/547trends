@@ -512,6 +512,14 @@
   // fixed left and right rails outside the scrolling plot.  Title text is
   // rendered separately in HTML so it doesn't fight with the tick numbers
   // for column width.
+  //
+  // For the left side: we want the axis line flush against the *right* edge
+  // of the canvas (so it abuts the plot area) and labels rendered to its
+  // *left* (i.e. occupying the canvas interior, fully visible).  Chart.js's
+  // `position: 'left'` does exactly that.  But because Chart.js anchors tick
+  // labels to the axis line and they extend leftward into the canvas, we
+  // need the canvas wide enough to hold the longest label.  The fix is to
+  // explicitly set the axis offset and ensure enough internal padding.
   function drawAxisOnly(canvas, side, range) {
     const isLeft = (side === 'left');
     const minY = isLeft ? range.leftMin  : range.rightMin;
@@ -531,7 +539,10 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        layout: { padding: { top: 8, bottom: 8, left: isLeft ? 8 : 0, right: isLeft ? 0 : 8 } },
+        // Generous left/right padding so the widest tick label has room
+        // inside the canvas — Chart.js draws labels relative to the axis
+        // line, which sits on the canvas's edge.
+        layout: { padding: { top: 8, bottom: 8, left: isLeft ? 36 : 0, right: isLeft ? 0 : 28 } },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         scales: {
           x: { display: false, type: 'linear' },
