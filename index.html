@@ -128,7 +128,7 @@
      Grid: [left axis | scroller (flexible) | right axis] */
   .chart-history {
     display: grid;
-    grid-template-columns: 58px 1fr 58px;
+    grid-template-columns: 84px 1fr 78px;
     height: 360px;
     background: var(--panel);
   }
@@ -436,7 +436,7 @@
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
-        layout: { padding: { left: 0, right: 0 } },
+        layout: { padding: { left: 0, right: 0, top: 8, bottom: 8 } },
         plugins: {
           legend: { labels: { color: getCssVar('--ink'), boxWidth: 12, boxHeight: 4 } },
           tooltip: {
@@ -504,7 +504,7 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        layout: { padding: { top: 0, bottom: 0 } },
+        layout: { padding: { top: 8, bottom: 8 } },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         scales: {
           x: { display: false, type: 'linear' },
