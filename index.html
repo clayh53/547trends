@@ -139,12 +139,22 @@
     width: 100%;
     height: 100%;
     min-width: 0;
-    overflow: visible;
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
   }
-  .chart-history-axis canvas {
-    /* Chart.js sizes the canvas to fill the parent. */
-    width: 100% !important;
-    height: 100% !important;
+  .chart-history-axis .tick {
+    position: absolute;
+    right: 6px;
+    text-align: right;
+    white-space: nowrap;
+    line-height: 1;
+    transform: translateY(-50%);   /* center text vertically on its tick line */
+  }
+  .chart-history-axis.right .tick {
+    right: auto;
+    left: 6px;
+    text-align: left;
   }
   .chart-history-title {
     height: 100%;
@@ -247,13 +257,13 @@
     <h2>Full Production History</h2>
     <div class="chart-history">
       <div class="chart-history-title"><span>Oil / Water (bbl)</span></div>
-      <div class="chart-history-axis"><canvas id="chart-history-yleft"></canvas></div>
+      <div class="chart-history-axis" id="axis-left"></div>
       <div class="chart-history-scroller" id="history-scroller">
         <div class="chart-history-inner" id="history-inner">
           <canvas id="chart-history"></canvas>
         </div>
       </div>
-      <div class="chart-history-axis"><canvas id="chart-history-yright"></canvas></div>
+      <div class="chart-history-axis right" id="axis-right"></div>
       <div class="chart-history-title"><span>Gas (mmcf)</span></div>
     </div>
     <div class="scroll-hint">← scroll horizontally to see earlier periods →</div>
@@ -508,56 +518,39 @@
     });
   }
 
-  // A degenerate "chart" that draws only a single y-axis — used as the
-  // fixed left and right rails outside the scrolling plot.  Title text is
-  // rendered separately in HTML so it doesn't fight with the tick numbers
-  // for column width.
-  //
-  // For the left side: we want the axis line flush against the *right* edge
-  // of the canvas (so it abuts the plot area) and labels rendered to its
-  // *left* (i.e. occupying the canvas interior, fully visible).  Chart.js's
-  // `position: 'left'` does exactly that.  But because Chart.js anchors tick
-  // labels to the axis line and they extend leftward into the canvas, we
-  // need the canvas wide enough to hold the longest label.  The fix is to
-  // explicitly set the axis offset and ensure enough internal padding.
-  function drawAxisOnly(canvas, side, range) {
-    const isLeft = (side === 'left');
-    const minY = isLeft ? range.leftMin  : range.rightMin;
-    const maxY = isLeft ? range.leftMax  : range.rightMax;
-    return new Chart(canvas, {
-      type: 'line',
-      data: {
-        datasets: [{
-          data: [{ x: 0, y: minY }, { x: 1, y: maxY }],
-          borderColor: 'transparent',
-          backgroundColor: 'transparent',
-          pointRadius: 0,
-          yAxisID: 'y',
-        }],
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: false,
-        // Generous left/right padding so the widest tick label has room
-        // inside the canvas — Chart.js draws labels relative to the axis
-        // line, which sits on the canvas's edge.
-        layout: { padding: { top: 8, bottom: 8, left: isLeft ? 36 : 0, right: isLeft ? 0 : 28 } },
-        plugins: { legend: { display: false }, tooltip: { enabled: false } },
-        scales: {
-          x: { display: false, type: 'linear' },
-          y: {
-            type: 'linear',
-            position: isLeft ? 'left' : 'right',
-            min: minY,
-            max: maxY,
-            grid: { display: false },
-            border: { display: false },
-            ticks: { color: getCssVar('--ink-soft'), padding: 4 },
-          },
-        },
-      },
-    });
+  // Render a fixed y-axis as plain HTML in the given container div.  We
+  // generate ~6 evenly-spaced ticks between min and max, position each as
+  // an absolutely-placed <div> at the correct fractional height inside the
+  // parent, and let CSS handle the alignment (right-aligned for left axis,
+  // left-aligned for right axis).  This avoids Chart.js's tendency to
+  // clip tick labels against the canvas edge.
+  function renderAxis(container, min, max) {
+    container.innerHTML = '';
+    // Nice tick step: aim for ~6 divisions, round to a "nice" multiple.
+    const range = max - min;
+    const rough = range / 6;
+    const pow = Math.pow(10, Math.floor(Math.log10(rough)));
+    const candidates = [1, 2, 2.5, 5, 10].map(m => m * pow);
+    const step = candidates.find(c => range / c <= 8) || pow * 10;
+    const ticks = [];
+    for (let v = Math.ceil(min / step) * step; v <= max + 0.0001; v += step) {
+      ticks.push(v);
+    }
+    // The data plot itself has 8px of top/bottom padding (see
+    // drawHistoryPlot's layout.padding), so the y-axis labels need to line
+    // up with the *inner* plot area — not the full container height.
+    const PAD_TOP = 8;
+    const PAD_BOTTOM = 8;
+    const innerHeight = `calc(100% - ${PAD_TOP + PAD_BOTTOM}px)`;
+    for (const v of ticks) {
+      const frac = (v - min) / (max - min);     // 0 at min, 1 at max
+      const el = document.createElement('div');
+      el.className = 'tick';
+      // Position from top: top padding + (1 - frac) * innerHeight
+      el.style.top = `calc(${PAD_TOP}px + (1 - ${frac}) * (100% - ${PAD_TOP + PAD_BOTTOM}px))`;
+      el.textContent = v.toLocaleString('en-US');
+      container.appendChild(el);
+    }
   }
 
   // --- Render ----------------------------------------------------------------
@@ -633,8 +626,8 @@
     // so the axes outside the scroller match the plot inside it.
     const filledHistory = fillCalendarGaps(rows);
     const yRanges = computeYRanges(filledHistory);
-    drawAxisOnly(document.getElementById('chart-history-yleft'),  'left',  yRanges);
-    drawAxisOnly(document.getElementById('chart-history-yright'), 'right', yRanges);
+    renderAxis(document.getElementById('axis-left'),  yRanges.leftMin,  yRanges.leftMax);
+    renderAxis(document.getElementById('axis-right'), yRanges.rightMin, yRanges.rightMax);
     drawHistoryPlot(document.getElementById('chart-history'), filledHistory, yRanges);
 
     // Scroll the history pane to the right (most recent) on load.
