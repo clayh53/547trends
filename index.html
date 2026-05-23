@@ -139,26 +139,20 @@
     height: 100%;
   }
   .chart-history-title {
-    position: relative;
     height: 100%;
     color: var(--ink-soft);
     font-size: 12px;
     overflow: hidden;
-  }
-  .chart-history-title span {
-    /* Render the rotated label centered in the column.  Using a fixed wide
-       width before rotation gives a predictable bounding box; the rotation
-       then maps that width onto vertical height. */
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 200px;
-    margin-left: -100px;     /* re-center after the width */
-    text-align: center;
-    transform: rotate(-90deg);
-    transform-origin: center center;
+    /* writing-mode rotates the *text flow* itself, so the element's
+       bounding box is naturally tall+narrow and only consumes its column's
+       width — no transform/absolute-positioning gymnastics needed. */
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);   /* read bottom-up instead of top-down */
+    display: flex;
+    align-items: center;
+    justify-content: center;
     white-space: nowrap;
-    pointer-events: none;    /* let mouse events fall through to chart */
+    pointer-events: none;
   }
   .chart-history-scroller {
     overflow-x: auto;
