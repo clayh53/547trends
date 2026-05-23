@@ -130,7 +130,7 @@
      Chart.js canvas that draws only numeric tick labels. */
   .chart-history {
     display: grid;
-    grid-template-columns: 22px 64px 1fr 56px 22px;
+    grid-template-columns: 22px 60px 1fr 44px 22px;
     height: 360px;
     background: var(--panel);
   }
@@ -143,15 +143,22 @@
     height: 100%;
     color: var(--ink-soft);
     font-size: 12px;
+    overflow: hidden;
   }
   .chart-history-title span {
-    /* Center the rotated label vertically in its column */
+    /* Render the rotated label centered in the column.  Using a fixed wide
+       width before rotation gives a predictable bounding box; the rotation
+       then maps that width onto vertical height. */
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-90deg);
-    transform-origin: center;
+    width: 200px;
+    margin-left: -100px;     /* re-center after the width */
+    text-align: center;
+    transform: rotate(-90deg);
+    transform-origin: center center;
     white-space: nowrap;
+    pointer-events: none;    /* let mouse events fall through to chart */
   }
   .chart-history-scroller {
     overflow-x: auto;
@@ -522,7 +529,7 @@
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        layout: { padding: { top: 8, bottom: 8 } },
+        layout: { padding: { top: 8, bottom: 8, left: isLeft ? 8 : 0, right: isLeft ? 0 : 8 } },
         plugins: { legend: { display: false }, tooltip: { enabled: false } },
         scales: {
           x: { display: false, type: 'linear' },
@@ -533,7 +540,7 @@
             max: maxY,
             grid: { display: false },
             border: { display: false },
-            ticks: { color: getCssVar('--ink-soft') },
+            ticks: { color: getCssVar('--ink-soft'), padding: 4 },
           },
         },
       },
