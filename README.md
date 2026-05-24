@@ -10,10 +10,10 @@ Daily production dashboard for HI-A547-C, sourced from Arena Energy DPRs.
 ## Pipeline overview
 
 ```
-Arena email  ──▶  Gmail API  ──▶  Dropbox folder (PDFs + CSV)
+Arena email  ──▶  Gmail API  ──▶  Dropbox folder (PDFs only)
                                           │
                                           ▼
-                              extract_arena.py  ──▶  CSV / JSON
+                              extract_arena.py  ──▶  ~/code/arena-pipeline/output/  (CSV / JSON)
                                           │
                                           ▼
                               git push  ──▶  this repo  ──▶  GitHub Pages
@@ -26,15 +26,18 @@ Trigger: launchd fires at login and every 4 hours of uptime.
 | What | Where |
 |---|---|
 | Scripts and venv | `~/code/arena-pipeline/` |
-| PDFs and CSV/JSON outputs | `~/Library/CloudStorage/Dropbox/Arena Production Reports/` |
+| PDFs (input) | `~/Library/CloudStorage/Dropbox/Arena Production Reports/` |
+| CSV / JSON outputs | `~/code/arena-pipeline/output/` |
 | Git working copy of this repo | `~/code/547trends/` |
 | launchd plist | `~/Library/LaunchAgents/com.clay.arena-daily-pull.plist` |
 | Main log | `~/Library/Logs/arena_daily_pull.log` |
 | stderr log | `~/Library/Logs/arena_daily_pull.stderr.log` |
 | OAuth credentials | `~/.config/arena-gmail/` |
 
-Scripts live outside `~/Library/CloudStorage/` because macOS TCC blocks
-launchd-spawned bash processes from accessing CloudStorage paths.
+Scripts AND CSV/JSON outputs live outside `~/Library/CloudStorage/` because
+macOS TCC blocks launchd-spawned bash processes from accessing CloudStorage
+paths. PDFs themselves still live in Dropbox — Python reads them fine, only
+bash is restricted.
 
 ## Troubleshooting
 
@@ -128,6 +131,7 @@ rm ~/.config/arena-gmail/token.json
 | `Extractor not found at /path/...` | Path drift after a move | Update the `EXTRACTOR` path in `arena_daily_pull.py` |
 | `git push` fails | SSH agent not loaded under launchd | The plist runs as you — keys in `~/.ssh/` should work; if not, run `ssh-add ~/.ssh/id_ed25519` and try again |
 | Dashboard shows stale data | `git push` succeeded but Pages hasn't rebuilt | Wait 1–2 min; check the **Actions** tab on GitHub for a green check on "pages build and deployment" |
+| `launchctl list \| grep arena` shows non-zero exit, but manual run works | Loaded plist points at old path | Edit `~/Library/LaunchAgents/com.clay.arena-daily-pull.plist`, then `launchctl unload && load` it |
 
 ## What gets shared publicly
 
