@@ -22930,5 +22930,14 @@
     "vent_flare": 125,
     "water": 6,
     "source_file": "2026-05-28__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-05-28",
+    "gas_sales": 11642,
+    "oil_sales": 641,
+    "pf_fuel": 73,
+    "vent_flare": 179,
+    "water": 7,
+    "source_file": "2026-05-29__Arena Partner DPR.pdf"
   }
 ]
