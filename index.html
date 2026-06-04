@@ -79,6 +79,23 @@
   }
 
   /* Latest production card */
+  .latest-remarks-title {
+    margin: 18px 0 6px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .latest-remarks {
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
   .latest-date {
     font-size: 19px;
     font-weight: 600;
@@ -241,6 +258,8 @@
         <div class="label loading">Loading...</div>
         <div class="value"></div>
       </div>
+      <h3 class="latest-remarks-title">Field Remarks</h3>
+      <div class="latest-remarks" id="latest-remarks">—</div>
     </div>
 
     <!-- Upper right: rolling 30-day -->
@@ -282,7 +301,7 @@
 
 <script type="module">
   // --- Config ----------------------------------------------------------------
-  const CSV_URL = 'arena_production.csv';
+  const DATA_URL = 'arena_production.json';
   const COLORS = {
     oil:   getCssVar('--oil'),
     gas:   getCssVar('--gas'),
@@ -296,27 +315,20 @@
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   }
 
-  // --- CSV parsing -----------------------------------------------------------
-  function parseCsv(text) {
-    const lines = text.trim().split(/\r?\n/);
-    const header = lines.shift().split(',');
-    const idx = Object.fromEntries(header.map((h, i) => [h, i]));
-    return lines.map(line => {
-      // Production reports don't contain quoted fields, simple split is safe.
-      const cols = line.split(',');
-      const num = key => {
-        const v = cols[idx[key]];
-        return (v === '' || v == null) ? null : Number(v);
-      };
-      return {
-        date:       cols[idx['production_date']],
-        gas_mmcf:   num('gas_sales')  != null ? num('gas_sales')  / 1000 : null,
-        oil_bbl:    num('oil_sales'),
-        water_bbl:  num('water'),
-        pf_fuel:    num('pf_fuel'),
-        vent_flare: num('vent_flare'),
-      };
-    });
+  // --- Data parsing ----------------------------------------------------------
+  // Source is arena_production.json (an array of row objects from the extractor).
+  // We map each row into the display shape used by the rest of the dashboard.
+  function parseRows(rows) {
+    const num = v => (v === '' || v == null) ? null : Number(v);
+    return rows.map(r => ({
+      date:          r.production_date,
+      gas_mmcf:      num(r.gas_sales)  != null ? num(r.gas_sales) / 1000 : null,
+      oil_bbl:       num(r.oil_sales),
+      water_bbl:     num(r.water),
+      pf_fuel:       num(r.pf_fuel),
+      vent_flare:    num(r.vent_flare),
+      field_remarks: (r.field_remarks || '').trim(),
+    }));
   }
 
   // --- Helpers ---------------------------------------------------------------
@@ -341,7 +353,7 @@
       if (prev != null) {
         for (let g = prev + oneDay; g < t; g += oneDay) {
           const d = new Date(g).toISOString().slice(0, 10);
-          out.push({ date: d, gas_mmcf: null, oil_bbl: null, water_bbl: null });
+          out.push({ date: d, gas_mmcf: null, oil_bbl: null, water_bbl: null, pf_fuel: null, vent_flare: null, field_remarks: '' });
         }
       }
       out.push(r);
@@ -573,6 +585,9 @@
       <div class="label">Vent / Flare</div>
       <div class="value">${fmtInt(latest.vent_flare)}<span class="unit">mcf</span></div>
     `;
+    const remarksEl = document.getElementById('latest-remarks');
+    const remarks = (latest.field_remarks || '').trim();
+    remarksEl.textContent = remarks || '—';
   }
 
   function renderUpdated(latest) {
@@ -581,18 +596,18 @@
 
   // --- Boot ------------------------------------------------------------------
   (async function main() {
-    let text;
+    let data;
     try {
-      const resp = await fetch(CSV_URL, { cache: 'no-store' });
+      const resp = await fetch(DATA_URL, { cache: 'no-store' });
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      text = await resp.text();
+      data = await resp.json();
     } catch (e) {
       document.getElementById('updated').innerHTML =
-        `<span class="error">Failed to load ${CSV_URL}: ${e.message}</span>`;
+        `<span class="error">Failed to load ${DATA_URL}: ${e.message}</span>`;
       return;
     }
 
-    const rows = parseCsv(text)
+    const rows = parseRows(data)
       .filter(r => r.date)
       .sort((a, b) => a.date.localeCompare(b.date));
 
