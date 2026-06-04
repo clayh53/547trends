@@ -79,6 +79,35 @@
   }
 
   /* Latest production card */
+  .date-nav {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 4px 0 12px;
+  }
+  .date-nav .latest-date {
+    margin: 0;
+    flex: 0 1 auto;
+  }
+  .nav-arrow {
+    appearance: none;
+    background: transparent;
+    border: none;
+    padding: 0 6px;
+    color: var(--ink-soft);
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+    user-select: none;
+    transition: color 120ms ease;
+  }
+  .nav-arrow:hover:not(:disabled) {
+    color: var(--ink);
+  }
+  .nav-arrow:disabled {
+    color: var(--rule);
+    cursor: default;
+  }
   .latest-remarks-title {
     margin: 18px 0 6px;
     padding-top: 14px;
@@ -252,8 +281,12 @@
   <div class="top-row">
     <!-- Upper left: latest -->
     <div class="panel">
-      <h2>Latest Daily Production</h2>
-      <div class="latest-date" id="latest-date">—</div>
+      <h2>Daily Production</h2>
+      <div class="date-nav">
+        <button class="nav-arrow" id="nav-prev" aria-label="Previous day" disabled>‹</button>
+        <div class="latest-date" id="latest-date">—</div>
+        <button class="nav-arrow" id="nav-next" aria-label="Next day" disabled>›</button>
+      </div>
       <div class="kv" id="latest-kv">
         <div class="label loading">Loading...</div>
         <div class="value"></div>
@@ -566,8 +599,23 @@
   }
 
   // --- Render ----------------------------------------------------------------
-  function renderLatest(latest) {
+  // Day-navigation state.  `__rows` and `__idx` live on window so the click
+  // and keyboard handlers can reach them without restructuring main().
+  function step(delta) {
+    const rows = window.__rows;
+    if (!rows) return;
+    const next = Math.max(0, Math.min(rows.length - 1, window.__idx + delta));
+    if (next === window.__idx) return;
+    window.__idx = next;
+    renderLatest(rows[next], next);
+  }
+  function renderLatest(latest, idx) {
     document.getElementById('latest-date').textContent = prettyDate(latest.date);
+    const rows = window.__rows;
+    if (rows) {
+      document.getElementById('nav-prev').disabled = (idx <= 0);
+      document.getElementById('nav-next').disabled = (idx >= rows.length - 1);
+    }
     const kv = document.getElementById('latest-kv');
     kv.innerHTML = `
       <div class="label"><span class="swatch gas"></span>Gas</div>
@@ -617,8 +665,18 @@
     }
 
     const latest = rows[rows.length - 1];
+    window.__rows = rows;
+    window.__idx = rows.length - 1;
     renderUpdated(latest);
-    renderLatest(latest);
+    renderLatest(latest, window.__idx);
+    document.getElementById('nav-prev').addEventListener('click', () => step(-1));
+    document.getElementById('nav-next').addEventListener('click', () => step(+1));
+    document.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+      if (e.key === 'ArrowLeft')  { step(-1); e.preventDefault(); }
+      if (e.key === 'ArrowRight') { step(+1); e.preventDefault(); }
+    });
 
     // 30-day chart: calendar last 30 days ending at latest production date.
     const oneDay = 86400000;
