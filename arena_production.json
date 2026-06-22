@@ -25708,5 +25708,15 @@
     "water": 44,
     "field_remarks": "HI- 547\nB\nChanged out all barton recorder charts.\nReplaced bad fuel line on temp. generator, primed and got it BOL.\nSwapped pipeline pumps and put some runtime on PAX- 7200 pump then swapped\nback, pump ran fine with no leaks.\nWent over ASC regulators on battery bank charging stations as per task manager.\nReplaced bad lovejoy coupling on floatcell circulation pump and got it back in \nservice.\nHad injection quill stopped up on water clarifier got that unclogged and back \npumping.\nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nWent over ASC regulators on battery bank charging stations as per task manager.\nDid our weekly chemical inventory and also added in daily chemical tracker for 547\nC \nto keep a daily record.\nEntered test on C- 2 well.",
     "source_file": "2026-06-20__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-06-20",
+    "gas_sales": 12839,
+    "oil_sales": 639,
+    "pf_fuel": 119,
+    "vent_flare": 17,
+    "water": 40,
+    "field_remarks": "HI- 547\nB\nStarted test on B- 4 well.\nCleaned up around platform. \nWent through hurricane checklist.\nTopped off oil in platform diesel generator.\nChanged out glycol sock and charcoal filters.\nDOCO will be pulling measurements on compressor pipping for new insulation this \nevening.\nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nC- 1 S/I 3\nhrs due to a PSH on FA 3 due to an ice plug in flowline. Equalized to header\nthen bleed down to flare. Raised rate on ice treat and heard ice plug pass through, \nwell BOL.",
+    "source_file": "2026-06-21__Arena Partner DPR.pdf"
   }
 ]
