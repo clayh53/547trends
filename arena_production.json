@@ -25718,5 +25718,15 @@
     "water": 40,
     "field_remarks": "HI- 547\nB\nStarted test on B- 4 well.\nCleaned up around platform. \nWent through hurricane checklist.\nTopped off oil in platform diesel generator.\nChanged out glycol sock and charcoal filters.\nDOCO will be pulling measurements on compressor pipping for new insulation this \nevening.\nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nC- 1 S/I 3\nhrs due to a PSH on FA 3 due to an ice plug in flowline. Equalized to header\nthen bleed down to flare. Raised rate on ice treat and heard ice plug pass through, \nwell BOL.",
     "source_file": "2026-06-21__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-06-21",
+    "gas_sales": 13424,
+    "oil_sales": 647,
+    "pf_fuel": 119,
+    "vent_flare": 17,
+    "water": 44,
+    "field_remarks": "HI- 547\nB\nEntered test on B- 4 well.\nDid our weekly biocide treatment.\nFloyd went through some hard files, SEMS and Veris and had to add a couple \nmonths files that were missing in hard files.\nNot able to make visit to HI 582\nC due to weather, Emelie Rose on standby.\nTemp. generator went down two times while pipeline pumps were trying to come \non due to undervoltage and low frequency, tried changing fuel filters to see if that \nwas issue, unit BOL at this moment and taking the load.\nBelt came off platform diesel generator, replaced belt and unit back on standby.\nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nC- 1 well S/I at\n2:15\nam due to a PSH on FA- 3\n, had 3\nhrs downtime, bled sensing line \nout and received a little fluid, isolated well and equalized flowline to vent scrubber \nand had an ice plug in flowline, operator heard ice plug pass, FA- 3 pressure reading\ncorrectly now. Raised injection rate on Ice treat to flowline on well also.\nHI 582\nD, WC 498\nMade our weekly visits yesterday to HI 582\nD and WC 498\n, did storm assessments on \nboth platforms and everything looked good with no issues. Foghorn remains OOS at \nHI 582\nD ESSI tech ordered parts for repair. Made a flyover at HI 582\nC",
+    "source_file": "2026-06-22__Arena Partner DPR.pdf"
   }
 ]
