@@ -25808,5 +25808,15 @@
     "water": 21,
     "field_remarks": "HI- 547\nB\nCrane Ops. offload and backloaded Emelie Rose, personnel transfer, taking on \nwater.\nChanged out dehy unit sock filters.\nStarted cleaning up around platform for crew change.\nEntered all reports and inspections for HI 465\nA and HI 582\nC.\nMade Coupa orders. \nHI- 547\nC\nS/I 4\nhrs due to PSH on FA 3 .\nMade daily visit and did our daily inspections, pulled shakeouts. \nCrane Ops. offload and backloaded Emelie Rose.\nMethanol pump packing was leaking tightened packing will order a spare kit for \npump and packings.\nC- 1 well S/I due to PSH on FA 3 due to ice plug ran a new range chart and set PSH 1170 / PSL 799\n. Checked methanol rate and blew ice plug down flowline to vent \nscrubber.  \nChoke increase to a \n13/64 on C- 1 well.\nEntered another test on C- 2 well then started a test on C- 1 well.",
     "source_file": "2026-06-30__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-06-30",
+    "gas_sales": 13222,
+    "oil_sales": 595,
+    "pf_fuel": 128,
+    "vent_flare": 16,
+    "water": 24,
+    "field_remarks": "Started closing out monthly paperwork.\nContinued cleaning up around platform for crew change.\nEntered all reports and inspections for HI 582\nC and HI 582\nD.\nDid walk throughs with PCI to look over construction drawings. \nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts. \nMade adjustments to C- 1 adj. choke and scada choke to get better differential\npressure, so the scada choke not taking such a pressure cut, hopefully this helps \nwith the PSH on FA 3 sensing line. Adj. choke set at\n17/64 and the scada choke at\n17/64 also. FA 2 PSL is field set at 1200\npsi, running new range for PSL. FA 3 PSH field\nset 1500\npsi running a new range on FA 3 also.\nHad to tighten up packing again on methanol pump \nC- 1 well S/I due to PSH on FA 3\n,ran a new range chart and set PSH 1170 / PSL 799 .\nChecked methanol rate and blew ice plug down flowline to vent scrubber.  \nChoke increase to a \n13/64 on C- 1 well.\nEntered another test on C- 2 well then started a test on C- 1 well.\nHI 582\nD\nPIC, Danos PSV techs and BSEE did PSV inspections and holding checks.\nEmelie Rose assisted through the day. \nHI 582\nC\nOperations removed crystal gauges from C- 3 and C- 11 wells to complete casing\ndiagnostics and also grabbed the monthly casing pressure",
+    "source_file": "2026-07-01__Arena Partner DPR.pdf"
   }
 ]
