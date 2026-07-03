@@ -25818,5 +25818,15 @@
     "water": 24,
     "field_remarks": "Started closing out monthly paperwork.\nContinued cleaning up around platform for crew change.\nEntered all reports and inspections for HI 582\nC and HI 582\nD.\nDid walk throughs with PCI to look over construction drawings. \nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts. \nMade adjustments to C- 1 adj. choke and scada choke to get better differential\npressure, so the scada choke not taking such a pressure cut, hopefully this helps \nwith the PSH on FA 3 sensing line. Adj. choke set at\n17/64 and the scada choke at\n17/64 also. FA 2 PSL is field set at 1200\npsi, running new range for PSL. FA 3 PSH field\nset 1500\npsi running a new range on FA 3 also.\nHad to tighten up packing again on methanol pump \nC- 1 well S/I due to PSH on FA 3\n,ran a new range chart and set PSH 1170 / PSL 799 .\nChecked methanol rate and blew ice plug down flowline to vent scrubber.  \nChoke increase to a \n13/64 on C- 1 well.\nEntered another test on C- 2 well then started a test on C- 1 well.\nHI 582\nD\nPIC, Danos PSV techs and BSEE did PSV inspections and holding checks.\nEmelie Rose assisted through the day. \nHI 582\nC\nOperations removed crystal gauges from C- 3 and C- 11 wells to complete casing\ndiagnostics and also grabbed the monthly casing pressure",
     "source_file": "2026-07-01__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-07-01",
+    "gas_sales": 14316,
+    "oil_sales": 643,
+    "pf_fuel": 127,
+    "vent_flare": 17,
+    "water": 32,
+    "field_remarks": "Made crew change.\nWorked on weekly inspections\nGoing over notes and catching up from last 2 weeks\nClosing out end of the month paperwork\nCody went over to HI- 536 with Petroleum coordinator to scope out work to be done\nat HI- 536\nIncreased choke on the C 1 well to a 22 Scada 19 manual choke and brought sales\nrate up to 14.5 mmcf\nnoticed water level running higher in treater. Found that the water dump was \nplugged up with appears to be paraffin. Got it cleaned out and level back to normal\nWalking platform with new operator and showing him around.\n \nHI- 547\nC\nFixed methanol pump and got it back going. We found it with a bunch of leaks not \nworking correctly\nMade adjustment on manual choke and test separator for the C 1 well.",
+    "source_file": "2026-07-02__Arena Partner DPR.pdf"
   }
 ]
