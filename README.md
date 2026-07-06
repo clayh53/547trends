@@ -132,6 +132,8 @@ rm ~/.config/arena-gmail/token.json
 | `git push` fails | SSH agent not loaded under launchd | The plist runs as you — keys in `~/.ssh/` should work; if not, run `ssh-add ~/.ssh/id_ed25519` and try again |
 | Dashboard shows stale data | `git push` succeeded but Pages hasn't rebuilt | Wait 1–2 min; check the **Actions** tab on GitHub for a green check on "pages build and deployment" |
 | `launchctl list \| grep arena` shows non-zero exit, but manual run works | Loaded plist points at old path | Edit `~/Library/LaunchAgents/com.clay.arena-daily-pull.plist`, then `launchctl unload && load` it |
+| Pages workflow keeps failing on the `deploy` step with `Deployment failed, try again later.` | GitHub Pages internal state is wedged; empty commits and re-runs won't clear it | Settings → Pages → change branch (e.g. to `None` or `/docs`), Save, then change back to `main` / `(root)` and Save. Forces GitHub to re-provision. |
+| Pages settings say "Last deployed X minutes ago" but the live URL serves stale content | Metadata service and CDN fell out of sync (same underlying issue as above) | Same fix — force a source reconfigure to reset internal state |
 
 ## What gets shared publicly
 
