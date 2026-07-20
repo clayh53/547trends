@@ -25988,5 +25988,15 @@
     "water": 58,
     "field_remarks": "HI- 547\nB\nEntered a test on B- 4 well.\nDid some BSEE pre-testing on all levels.\nInstalled new fan in crane cab. \nDid our monthly EEP drill.\nCleaned fluid out pipeline pump discharge sensing line and got it back working \ncorrectly.\nGenesis came out and did our monthly gas sales inspection. Installed 6 new\nbatteries in battery box for digital gas sales panel on sub-cellar deck.\nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nEntered another test on C- 1 well and put C- 2 well in test.\nHI 582\nC \nSent out a detailed list and pictures for items on HI 582\nC that need to be addressed. \nUpper-management suspended boarding the platform until top side is repaired and \nSafed out.",
     "source_file": "2026-07-18__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-07-18",
+    "gas_sales": 16200,
+    "oil_sales": 647,
+    "pf_fuel": 123,
+    "vent_flare": 17,
+    "water": 58,
+    "field_remarks": "HI- 547\nB\nStarted a test on B- 2 well.\nDid BSEE pre-testing on some pilots. \nSwapped generators and did our weekly run on platform diesel generator.\nChanged oil in temp. generator due to 1000\nhrs runtime, also changed fuel filter.\nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nStarted a test on the C- 2 well.\nHI- 582\nD\nMade weekly visit and everything is good in working condition.",
+    "source_file": "2026-07-19__Arena Partner DPR.pdf"
   }
 ]
