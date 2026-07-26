@@ -26048,5 +26048,15 @@
     "water": 4,
     "field_remarks": "HI- 547\nB\nB-wells S/I total of 16\nhrs due to bad mag on comp.\nB-wells S/I 2\nhrs due to comp. had wet plugs not carrying a load, changed plugs and \ntightened a couple valve covers that were leaking, tightened up main water pump \nbelts and got unit BOL.\nMonitored and maintained platform through the weather. \nStarted a test on B- 1 well.\nCleaned up in MCC room and started on Conex.\nHad issues with total flow trying to lock up after the weather, pulled circuit board \nand blew it off and cleaned connections got it back working.\nReplaced all barton recorder charts.\nHI- 547\nC\nNo daily visit due to weather.",
     "source_file": "2026-07-24__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-07-24",
+    "gas_sales": 11024,
+    "oil_sales": 474,
+    "pf_fuel": 115,
+    "vent_flare": 27,
+    "water": 5,
+    "field_remarks": "HI- 547\nB\nB-wells S/I 2\nhrs due to bad mag on compressor.\nVashton with Pelstar installed new mag on compressor and tightened all belts unit \nBOL. He brought both used mags in for repair, also ordered new mag drive plates \nand new timing light.\nCrane Ops. topped off diesel day tank, oil day tank and Waxtreat day tank.\nGot manifest ready for upcoming boat run.\nCleaned up around platform and in Conex box.\nIssues with total flow on fire wall again not letting you scroll through vessels to \ncheck volumes and the screen losing power, powered back up and working \ncorrectly at this moment. Spoke with measurement about it and will get him info to \nget quote to order spare.\nRebuilt circulation pump for wet/dry oil tank due to busted diaphragm.  \nHI- 547\nC\nMade daily visit and did our daily inspections, pulled shakeouts.\nOpened C- 1 well SSV\n\u2019\ns to check scada choke, no leaks.\nOpened C- 2 well as per upper-management for a rate of 11\nmmcfd to a 11.5\nmmcfd, \nadj. choke \n39/64 and scada choke\n29/64 at a 11.4\nmmcfd rate. Differential pressure \nabout 380\npsi.\nStarted test on C- 2 well after choke increase.",
+    "source_file": "2026-07-25__Arena Partner DPR.pdf"
   }
 ]
