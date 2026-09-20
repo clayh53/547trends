@@ -26588,5 +26588,15 @@
     "water": 59,
     "field_remarks": "HI- 547\nB\nMonitored and maintained platform through weather.\nEntered a test on B- 2 well and put B- 4 well to test.\nTopped off platform diesel generator with oil, diesel and washed-out containment \nskid.\nWent through PPE boxes as per audit and will replace a few items, will check \ninventory at HI 547\nC tomorrow when weather clears up.\nRebuilt the wet/dry oil tank circulation pump.\nGot info off treater water dump 2220 top works, will be replacing due to corrosion\nand also have a spare. \nHI- 547\nC\nMade our daily visit.\nReset COMMS to get scada back communicating from 547\nC to 547\nB.\nRestarted test on C- 2 well test diverted due to COMMS failure.\nScada chokes shut on wells for a split second while resetting COMMS.",
     "source_file": "2026-09-18__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-09-18",
+    "gas_sales": 16439,
+    "oil_sales": 584,
+    "pf_fuel": 82,
+    "vent_flare": 16,
+    "water": 64,
+    "field_remarks": "HI- 547\nB\nStarted a test on B- 4 well.\nDanos electrician went through platform and changed bad light bulbs, fixed bad a \nconnection for heliport light, went over junction boxes and CLX cables.\nApplied a coat with yellow paint on handrails on sub-cellar deck.\nWent through SEMS and Veris.\nUpdated SDS sheets as per SEMS audit in task manager, will continue updating list \ntomorrow.\nClosed out task on chemical PPE boxes for HI 547\nB and HI 547\nC, ordered new PPE for \nboth locations.\nGot list together for temp. injection line for B/ 4 G/L.\nHI- 547\nC\nMade our daily visit and pulled shakeouts.\nEntered another test on C- 2 well.\nStenciled pig launchers on 9010 & 9020 pipeline and also stenciled the paint locker.\nWent through PPE box.\nUpdated SDS sheets as per SEMS audit in task manager.\nHIS did our annual firefighting and lifesaving inspection and finished up report.\nContinued to monitor C- 2 production casing, still continuing to slowly rise, currently\nat 1848\npsi.",
+    "source_file": "2026-09-19__Arena Partner DPR.pdf"
   }
 ]
