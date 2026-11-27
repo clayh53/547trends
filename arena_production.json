@@ -27258,5 +27258,15 @@
     "water": 49,
     "field_remarks": "HI- 547\nB \nWell Test-B 1 C- 2\nContinue Working on tool room\nWork on FLIR repair tracker\nTouch up paint on trip hazards.\nHI- 547\nC\nDaily visit shakeouts and casings.\nChemical inventory. Platform status",
     "source_file": "2026-11-25__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-11-25",
+    "gas_sales": 11136,
+    "oil_sales": 327,
+    "pf_fuel": 66,
+    "vent_flare": 14,
+    "water": 30,
+    "field_remarks": "Hi- 547\nB \nWell test B- 1 C- 2\n \nWeekly fire water pump \nWeekly capsule \nChemical inventory\nMaintained production in cold and high winds.\nChanged Diaphragms in B-tex pump\nHI- 547\nC\nDaily Visit shakeouts and casings",
+    "source_file": "2026-11-26__Arena Partner DPR.pdf"
   }
 ]
