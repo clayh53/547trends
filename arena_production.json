@@ -27268,5 +27268,15 @@
     "water": 30,
     "field_remarks": "Hi- 547\nB \nWell test B- 1 C- 2\n \nWeekly fire water pump \nWeekly capsule \nChemical inventory\nMaintained production in cold and high winds.\nChanged Diaphragms in B-tex pump\nHI- 547\nC\nDaily Visit shakeouts and casings",
     "source_file": "2026-11-26__Arena Partner DPR.pdf"
+  },
+  {
+    "production_date": "2026-11-26",
+    "gas_sales": 13381,
+    "oil_sales": 411,
+    "pf_fuel": 67,
+    "vent_flare": 13,
+    "water": 49,
+    "field_remarks": "HI- 547\nB \nClean skids on production deck\nBring C-platform online \nChange sock filters\nFill diesel day tank.\nTopped of compressor\nHI- 547\nC\nDaily visit shakeouts and casings\nLit cat heaters",
+    "source_file": "2026-11-27__Arena Partner DPR.pdf"
   }
 ]
